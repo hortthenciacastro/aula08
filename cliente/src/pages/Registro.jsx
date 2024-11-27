@@ -1,70 +1,57 @@
-import React, { useState } from 'react';
-
-export default function Registrar() {
-  const [nome, setNome] = useState('');
-  const [email, setEmail] = useState('');
-
- 
-  const registrar = async (event) => {
-    event.preventDefault(); 
-    if (!nome || !email) {
-      alert("Por favor, preencha todos os campos.");
-      return;
-    }
-
-    console.log("Registrando usuário...");
-    console.log("Nome:", nome);
-    console.log("E-mail:", email);
-
-
-   event.preventDefault();
-   try {
-    await fetch ('http://localhost:3000/usuarios', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        nome: nome,
-        email: email
-      })
-    });
-   } catch {
-    alert("Ocorreu um erro na aplicação.");
-   }
-
-    setNome('');
-    setEmail('');
-  };
-
-  return (
-    <main>
-      <h1>Cadastro de Usuário</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="nome">Nome:</label>
-          <input
-            type="text"
-            id="nome"
-            value={nome} 
-            onChange={(e) => setNome(e.target.value)} 
-            placeholder="Digite seu nome"
-          />
+import { useEffect, useState } from "react";
+export default function registrar(){
+    const [usuarios, setUsuarios] = useState([]);         
+    const [gmail, setGmail] = useState([]);
+    useEffect(() => {
+      const buscarUsuario = async () => {
+        try {
+          const resposta = await fetch("http://localhost:3000/usuarios");
+          const dados = await resposta.json();
+          setUsuarios(dados);
+          setGmail(dados);
+        } catch {
+          alert('Ocorreu um erro ao carregar a página.');
+        }
+      }
+      buscarUsuario();
+    }, [])
+    return(
+        <>
+    <table>
+        <div className="todos">
+        <div className="pagina1">
+        <tr>
+          <td className="border">Nome</td>
+        </tr>
+        
+        {
+            usuarios.map((usuario) =>
+                <tr key={usuario.id}>
+            
+          <div className="separar">
+            <td>{usuario.nome}</td>
+          </div>
+          </tr>
+          )}
+          </div>
+          
+        <div className="pagina2">
+  
+          <tr>
+          <td className="border">E-mail</td>
+        </tr>
+        {
+            gmail.map((gmail) =>
+                <tr key={gmail.id}>
+              
+          <div className="separar">
+            <td>{gmail.email}</td>
+          </div>
+          </tr>
+        )}
         </div>
-
-        <div>
-          <label htmlFor="email">E-mail:</label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Digite seu e-mail"
-          />
-        </div>
-
-        <button type="submit">Registrar</button>
-      </form>
-    </main>
-  );
+        </div>  
+      </table>
+        </>
+    )
 }
-
-export default Registro;
