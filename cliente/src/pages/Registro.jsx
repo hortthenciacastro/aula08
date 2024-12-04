@@ -1,57 +1,54 @@
-import { useEffect, useState } from "react";
-export default function registrar(){
-    const [usuarios, setUsuarios] = useState([]);         
-    const [gmail, setGmail] = useState([]);
-    useEffect(() => {
-      const buscarUsuario = async () => {
-        try {
-          const resposta = await fetch("http://localhost:3000/usuarios");
-          const dados = await resposta.json();
-          setUsuarios(dados);
-          setGmail(dados);
-        } catch {
-          alert('Ocorreu um erro ao carregar a página.');
-        }
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+export default function Registrar() {
+  const [nome, setNome] = useState('');
+  const [email, setEmail] = useState('');
+  const navigate = useNavigate();
+
+  const registro = async (event) => {
+    event.preventDefault();
+    try {
+      const resposta = await fetch('http://localhost:3000/usuarios', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nome: nome,
+          email: email,
+        }),
+      });
+
+      if (resposta.ok) {
+        navigate('/');
+      } else {
+        alert('Erro no registro! Tente novamente.');
       }
-      buscarUsuario();
-    }, [])
-    return(
-        <>
-    <table>
-        <div className="todos">
-        <div className="pagina1">
-        <tr>
-          <td className="border">Nome</td>
-        </tr>
-        
-        {
-            usuarios.map((usuario) =>
-                <tr key={usuario.id}>
-            
-          <div className="separar">
-            <td>{usuario.nome}</td>
-          </div>
-          </tr>
-          )}
-          </div>
-          
-        <div className="pagina2">
-  
-          <tr>
-          <td className="border">E-mail</td>
-        </tr>
-        {
-            gmail.map((gmail) =>
-                <tr key={gmail.id}>
-              
-          <div className="separar">
-            <td>{gmail.email}</td>
-          </div>
-          </tr>
-        )}
+    } catch (err) {
+      alert('Erro no registro!', err);
+    }
+  };
+
+  return (
+    <main>
+      <form onSubmit={registro}>
+        <div>
+          <label>Nome</label>
+          <input
+            type="text"
+            value={nome}
+            onChange={(event) => setNome(event.target.value)}
+          />
         </div>
-        </div>  
-      </table>
-        </>
-    )
+        <div>
+          <label>Email</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+          />
+        </div>
+        <button type="submit">Salvar</button>
+      </form>
+    </main>
+  );
 }
